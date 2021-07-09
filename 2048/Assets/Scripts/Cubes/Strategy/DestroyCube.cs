@@ -15,11 +15,8 @@ namespace Game2048
         void ICubeStrategy.OnCollision(Collision collision)
         {
             var mergeCube = collision.gameObject.GetComponent<Cube>();
-            if (mergeCube != null && mergeCube.Strategy.CanCollision && _canCollision)
+            if (mergeCube != null && mergeCube.CanCollision && _canCollision)
             {
-                mergeCube.Strategy.CanCollision = false;
-                _canCollision = false;
-
                 Object.Destroy(mergeCube.gameObject);
                 Object.Destroy(_cube.gameObject);
             }
@@ -29,10 +26,9 @@ namespace Game2048
         {
             _cube = cube;
             cube.number = 5;
-            cube.Strategy = this;
-
             offsetIndex = OffsetIndex;
             cube.transform.localScale = Vector3.one * DefaultScale;
+            cube.SetStrategy(this);
             _canCollision = true;
         }
     }

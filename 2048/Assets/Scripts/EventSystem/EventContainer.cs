@@ -44,7 +44,7 @@ namespace Game2048
 
         private bool TryGetListenerAction(object listener, out WeakReference listenerReference)
         {
-            listenerReference = _listeners.Keys.First(x => x.Target == listener);
+            listenerReference = _listeners.Keys.FirstOrDefault(x => x.Target == listener);
             return listenerReference != null;
         }
     }

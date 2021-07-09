@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cubePrefab: {fileID: 6040885303737297994, guid: 3234b7a85a3a50e43b17402f511e7941, type: 3}
   _offsetConfig: {fileID: 11400000, guid: e8daae653736e694fbb29e1243c3b006, type: 2}
+  _gameArea: {fileID: 11400000, guid: 75ec22f137e9b8d478b1c4c7ebab73be, type: 2}
+  _deadArea: {fileID: 11400000, guid: 73586c8f113dcde4f805934acf087177, type: 2}

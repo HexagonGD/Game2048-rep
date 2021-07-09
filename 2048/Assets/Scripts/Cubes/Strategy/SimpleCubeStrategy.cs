@@ -15,20 +15,12 @@ namespace Game2048
         void ICubeStrategy.OnCollision(Collision collision)
         {
             var mergeCube = collision.gameObject.GetComponent<Cube>();
-            if (mergeCube != null && mergeCube.Strategy.CanCollision && mergeCube.number == _cube.number)
+            if (mergeCube != null && mergeCube.CanCollision && mergeCube.number == _cube.number)
             {
-                mergeCube.Strategy.CanCollision = false;
-                CanCollision = false;
-
                 var nextNumber = mergeCube.number * CoefficientMerge;
-                var position = collision.contacts[0].point;
-                var velocity = Cube.GetTotalVelocity(_cube.Rigidbody, mergeCube.Rigidbody);
-                var strategy = mergeCube.Strategy;
+                var strategy = new SimpleCubeStrategy();
 
-                EventSystem.ExecuteEvent(new CubeMergeEvent(nextNumber, position, velocity, strategy));
-
-                Object.Destroy(collision.gameObject);
-                Object.Destroy(_cube.gameObject);
+                new Connector(_cube, mergeCube, nextNumber, strategy);
             }
         }
 
@@ -36,19 +28,39 @@ namespace Game2048
         {
             if (number > 2048)
             {
-                Object.Destroy(cube);
+                Debug.Log("Destroy");
+                Object.Destroy(cube.gameObject);
+                EventSystem.ExecuteEvent(new CubeMergeEvent(3, cube.transform.position, new EmptyCubeStrategy()));
                 offsetIndex = 0;
                 return;
             }
 
             _cube = cube;
-            cube.Strategy = this;
-
-            cube.number = number;
-
             offsetIndex = (int)Mathf.Log(number, 2) - 1;
             cube.transform.localScale = Vector3.one * (offsetIndex * ScaleFactor + DefaultScale);
+            cube.SetStrategy(this);
+
+            cube.number = number;
             CanCollision = true;
+
+            if (number != 2)
+            {
+                var velocity = Vector3.up * 7.5f + Vector3.left * 1.5f;
+                var area = General.Instance.GameResources.GameArea;
+                var hits = Physics.BoxCastAll(area.Center, area.Scale / 2f, Vector3.up, Quaternion.identity);
+                foreach (var hit in hits)
+                {
+                    var cubeFriend = hit.collider.gameObject.GetComponent<Cube>();
+                    if (cubeFriend != null && cubeFriend.number == number && cubeFriend != cube)
+                    {
+                        var deltaPosition = cubeFriend.transform.position - _cube.transform.position;
+                        velocity = deltaPosition * 0.75f + Vector3.up * 7.5f;
+                        break;
+                    }
+                }
+
+                _cube.Rigidbody.velocity = velocity;
+            }
         }
     }
 }

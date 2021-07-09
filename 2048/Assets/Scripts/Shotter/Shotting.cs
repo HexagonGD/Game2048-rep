@@ -24,7 +24,7 @@ namespace Game2048
         }
 
         public Cube SpawnCube(int number, Vector3 position, ICubeStrategy strategy)
-            => _handler.Spawn(number, position, Vector3.zero, strategy);
+            => _handler.Spawn(number, position, strategy);
 
         #region State Methods
         public void OnShot(ShotButtonClickEvent eventArg) => _state.Shot();

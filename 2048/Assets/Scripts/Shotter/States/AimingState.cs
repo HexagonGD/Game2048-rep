@@ -8,6 +8,7 @@ namespace Game2048
         private Transform _transformCube;
         private Rigidbody _rigidCube;
         private Ray ray = new Ray(new Vector3(6, 1, -1.9f), Vector3.forward);
+        private Vector3 _directionShot = new Vector3(-1, 0, 0);
 
         public AimingState(Shotting shotter)
         {
@@ -16,12 +17,6 @@ namespace Game2048
 
         void IShotterState.Begin()
         {
-            if (Physics.Raycast(ray, 2f))
-            {
-                _shotting.ChangeState(new LoseState());
-                return;
-            }
-
             var cube = SpawnRandomCube();
             _transformCube = cube.transform;
             _rigidCube = cube.GetComponent<Rigidbody>();
@@ -30,21 +25,17 @@ namespace Game2048
 
         private Cube SpawnRandomCube()
         {
-            var position = new Vector3(6f, 1f, Mathf.Sin(Time.time) * 1.5f);
+            var position = new Vector3(6f, 0.75f, 0);
             Cube cube;
 
             if (Random.value < 0.95f)
             {
-                var number = (int)Mathf.Pow(2, Random.Range(1, 3));
+                var number = (int)Mathf.Pow(2, Random.Range(1, 6));
                 cube = _shotting.SpawnCube(number, position, new SimpleCubeStrategy());
             }
             else if (Random.value < 0.75f)
             {
                 cube = _shotting.SpawnCube(1, position, new BonusCubeStrategy());
-            }
-            else if (Random.value < 0.75f)
-            {
-                cube = _shotting.SpawnCube(3, position, new EmptyCubeStrategy());
             }
             else
             {
@@ -67,14 +58,21 @@ namespace Game2048
                 _shotting.ChangeState(new LoseState());
                 return;
             }
-            var position = new Vector3(6f, 1f, Mathf.Sin(Time.time) * 1.5f);
+
+            var position = new Vector3(6f, 1f, -(Screen.width / 2f - Input.mousePosition.x) / Screen.width * 2.4f);
             _transformCube.position = position;
         }
 
         void IShotterState.Shot()
         {
-            _shotting.ChangeState(
-                new ShotState(_shotting, _transformCube.GetComponent<Cube>()));
+            if (_rigidCube == null)
+            {
+                _shotting.ChangeState(new LoseState());
+                return;
+            }
+
+            _rigidCube.velocity = _directionShot * 13f;
+            _shotting.ChangeState(new ReloadState(_shotting));
         }
     }
 }

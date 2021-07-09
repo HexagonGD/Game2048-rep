@@ -22,11 +22,10 @@ namespace Game2048
             EventSystem.RemoveListener<LoseGameEvent>(this);
         }
 
-        public Cube Spawn(int number, Vector3 position, Vector3 velocity, ICubeStrategy strategy)
+        public Cube Spawn(int number, Vector3 position, ICubeStrategy strategy)
         {
             var cube = Object.Instantiate(_cubePrefab);
             cube.transform.position = position;
-            cube.Rigidbody.velocity = velocity;
 
             strategy.SetSettingsCube(cube, number, out var offsetIndex);
             cube.GetComponent<MeshRenderer>().material.SetTextureOffset("_MainTex", _offsets[offsetIndex]);
@@ -37,7 +36,7 @@ namespace Game2048
         private void OnCubeMergeEvent(CubeMergeEvent eventArg)
         {
             SoundController.Instance.Blup();
-            Spawn(eventArg.number, eventArg.position, eventArg.totalVelocity, eventArg.strategy);
+            Spawn(eventArg.number, eventArg.position, eventArg.strategy);
         }
     }
 }

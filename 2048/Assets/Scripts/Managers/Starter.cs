@@ -4,19 +4,18 @@ namespace Game2048
 {
     public static class Starter
     {
-        public static Area spawnArea = new Area(-3f, 5f, -1.5f, 1.5f);
-
         public static void StartGame()
         {
             var handler = new CubeHandler();
             var shotter = new Shotting(handler);
+            var area = General.Instance.GameResources.GameArea;
 
-            for (var x = spawnArea.x1; x < spawnArea.x2; x++)
+            for(var x = area.Center.x - area.Scale.x / 2 + 1; x < area.Center.x + area.Scale.x / 2 - 1; x++)
             {
-                for (var z = spawnArea.y1; z <= spawnArea.y2; z++)
+                for(var z = area.Center.z - area.Scale.z / 2 + 0.3f; z < area.Center.z + area.Scale.z / 2 - 0.3f; z++)
                 {
-                    var position = new Vector3(x, 1, z);
-                    handler.Spawn(2, position, Vector3.zero, new SimpleCubeStrategy());
+                    var position = new Vector3(x, 0.5f, z);
+                    handler.Spawn(2, position, new SimpleCubeStrategy());
                 }
             }
         }

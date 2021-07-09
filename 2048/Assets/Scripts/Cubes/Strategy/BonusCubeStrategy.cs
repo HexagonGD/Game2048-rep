@@ -15,32 +15,30 @@ namespace Game2048
         void ICubeStrategy.OnCollision(Collision collision)
         {
             var mergeCube = collision.gameObject.GetComponent<Cube>();
-            if (mergeCube != null && mergeCube.Strategy.CanCollision)
+            if (mergeCube != null && mergeCube.CanCollision)
             {
-                mergeCube.Strategy.CanCollision = false;
-                _cube.Strategy.CanCollision = false;
+                _cube.SetStrategy(null);
+                mergeCube.SetStrategy(null);
 
                 var nextNumber = mergeCube.number * CoefficientMerge;
-                var position = collision.contacts[0].point;
-                var velocity = Cube.GetTotalVelocity(_cube.Rigidbody, mergeCube.Rigidbody);
-                var strategy = mergeCube.Strategy;
+                var position = mergeCube.transform.position;
+                var strategy = new SimpleCubeStrategy();
 
-                EventSystem.ExecuteEvent(new CubeMergeEvent(nextNumber, position, velocity, strategy));
+                EventSystem.ExecuteEvent(new CubeMergeEvent(nextNumber, position, strategy));
 
-                Object.Destroy(mergeCube.gameObject);
                 Object.Destroy(_cube.gameObject);
+                Object.Destroy(mergeCube.gameObject);
             }
         }
 
         void ICubeStrategy.SetSettingsCube(Cube cube, int number, out int offsetIndex)
         {
             _cube = cube;
-            cube.Strategy = this;
-
-            cube.number = 1;
-
             offsetIndex = OffsetIndex;
             cube.transform.localScale = Vector3.one * DefaultScale;
+            cube.SetStrategy(this);
+
+            cube.number = 1;
             CanCollision = true;
         }
     }
