@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +19,10 @@ namespace Game2048
 
         private void OnLoseGame(LoseGameEvent eventArg)
         {
+            if(File.Exists("save"))
+            {
+                File.Delete("Save");
+            }
             SceneManager.LoadScene("Game");
         }
     }

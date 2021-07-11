@@ -1,4 +1,4 @@
-using UnityEngine;
+using System.IO;
 
 namespace Game2048
 {
@@ -8,14 +8,11 @@ namespace Game2048
         {
             var handler = new CubeHandler();
             var shotter = new Shotting(handler);
-            var area = General.Instance.GameResources.GameArea;
-
-            for(var x = area.Center.x - area.Scale.x / 2 + 1; x < area.Center.x + area.Scale.x / 2 - 1; x++)
+            if (File.Exists("save"))
             {
-                for(var z = area.Center.z - area.Scale.z / 2 + 0.3f; z < area.Center.z + area.Scale.z / 2 - 0.3f; z++)
+                using (var reader = new BinaryReader(File.Open("save", FileMode.Open)))
                 {
-                    var position = new Vector3(x, 0.5f, z);
-                    handler.Spawn(2, position, new SimpleCubeStrategy());
+                    handler.Load(new LoadStream(reader));
                 }
             }
         }

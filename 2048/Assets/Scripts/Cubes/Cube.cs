@@ -1,15 +1,14 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Game2048
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(BoxCollider))]
-    public class Cube : MonoBehaviour
+    public class Cube : MonoBehaviour, ISave, ILoad
     {
-        public static Cube MainCube;
-
-        private Vector3 _finalScale;
+        public Action<Cube> Destroy;
 
         public static Vector3 GetTotalVelocity(Rigidbody rigidbodyA, Rigidbody rigidbodyB)
         {
@@ -30,11 +29,6 @@ namespace Game2048
             _rigidbody = GetComponent<Rigidbody>();
         }
 
-        private void Update()
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, _finalScale, Time.deltaTime * 5f);
-        }
-
         private void OnCollisionEnter(Collision collision)
         {
             _strategy?.OnCollision(collision);
@@ -43,8 +37,50 @@ namespace Game2048
         public void SetStrategy(ICubeStrategy strategy)
         {
             _strategy = strategy;
-            _finalScale = transform.localScale;
+        }
+
+        public void PlaySpawnEffect()
+        {
+            _strategy?.PlaySpawnEffect();
+        }
+
+        public void ResetScale()
+        {
+            StartCoroutine(ScaleResize());
+        }
+
+        private void OnDestroy()
+        {
+            Destroy?.Invoke(this);
+        }
+
+        void ISave.Save(SaveStream stream)
+        {
+            stream.Write(number);
+            stream.Write(transform.position);
+            stream.Write(transform.rotation);
+        }
+
+        private IEnumerator ScaleResize()
+        {
+            var finalScale = transform.localScale;
             transform.localScale = Vector3.one;
+
+            while(finalScale.magnitude - transform.localScale.magnitude > 0.1f)
+            {
+                transform.localScale = Vector3.Lerp(transform.localScale, finalScale, Time.deltaTime * 5f);
+                Debug.Log(transform.localScale);
+                yield return null;
+            }
+        }
+
+        void ILoad.Load(LoadStream stream)
+        {
+            var position = stream.ReadVector3();
+            var rotation = stream.ReadQuaternion();
+
+            transform.position = position;
+            transform.rotation = rotation;
         }
     }
 }

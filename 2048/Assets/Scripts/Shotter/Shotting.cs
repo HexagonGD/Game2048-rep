@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 
 namespace Game2048
@@ -25,6 +26,14 @@ namespace Game2048
 
         public Cube SpawnCube(int number, Vector3 position, ICubeStrategy strategy)
             => _handler.Spawn(number, position, strategy);
+
+        public void Save()
+        {
+            using (var writer = new BinaryWriter(File.Open("save", FileMode.Create)))
+            {
+                _handler.Save(new SaveStream(writer));
+            }
+        }
 
         #region State Methods
         public void OnShot(ShotButtonClickEvent eventArg) => _state.Shot();

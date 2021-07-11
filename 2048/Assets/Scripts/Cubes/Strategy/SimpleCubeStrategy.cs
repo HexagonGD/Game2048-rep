@@ -28,7 +28,6 @@ namespace Game2048
         {
             if (number > 2048)
             {
-                Debug.Log("Destroy");
                 Object.Destroy(cube.gameObject);
                 EventSystem.ExecuteEvent(new CubeMergeEvent(3, cube.transform.position, new EmptyCubeStrategy()));
                 offsetIndex = 0;
@@ -42,8 +41,11 @@ namespace Game2048
 
             cube.number = number;
             CanCollision = true;
+        }
 
-            if (number != 2)
+        void ICubeStrategy.PlaySpawnEffect()
+        {
+            if (_cube.number != 2)
             {
                 var velocity = Vector3.up * 7.5f + Vector3.left * 1.5f;
                 var area = General.Instance.GameResources.GameArea;
@@ -51,7 +53,7 @@ namespace Game2048
                 foreach (var hit in hits)
                 {
                     var cubeFriend = hit.collider.gameObject.GetComponent<Cube>();
-                    if (cubeFriend != null && cubeFriend.number == number && cubeFriend != cube)
+                    if (cubeFriend != null && cubeFriend.number == _cube.number && cubeFriend != _cube)
                     {
                         var deltaPosition = cubeFriend.transform.position - _cube.transform.position;
                         velocity = deltaPosition * 0.75f + Vector3.up * 7.5f;

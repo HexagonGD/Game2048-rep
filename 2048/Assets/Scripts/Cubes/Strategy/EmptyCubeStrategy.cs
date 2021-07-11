@@ -15,6 +15,11 @@ namespace Game2048
             return;
         }
 
+        void ICubeStrategy.PlaySpawnEffect()
+        {
+            return;
+        }
+
         void ICubeStrategy.SetSettingsCube(Cube cube, int number, out int offsetIndex)
         {
             cube.number = number;
